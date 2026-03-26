@@ -273,9 +273,9 @@ export default function CircuitCanvas() {
             <div
               className="w-[30px] h-[30px] rounded-full border-2 flex items-center justify-center text-xs font-bold cursor-crosshair transition-all"
               style={{
-                backgroundColor: isOn ? '#22c55e33' : '#37415133',
-                borderColor: isOn ? '#22c55e' : '#64748b',
-                color: isOn ? '#22c55e' : '#94a3b8',
+                backgroundColor: isOn ? '#22c55e33' : '#ef444433',
+                borderColor: isOn ? '#22c55e' : '#ef4444',
+                color: isOn ? '#22c55e' : '#ef4444',
               }}
             >
               {label}
@@ -312,26 +312,23 @@ export default function CircuitCanvas() {
             >
               <svg width={44} height={56} viewBox="0 0 44 56">
                 {/* Glow */}
-                {isOn && (
-                  <circle cx={22} cy={22} r={22} fill="#22c55e" opacity={0.15} />
-                )}
+                {/* Glow behind bulb */}
+                <circle cx={22} cy={22} r={22} fill={isOn ? '#22c55e' : '#ef4444'} opacity={0.15} />
                 {/* Bulb glass */}
                 <path
                   d={`M 14 34 Q 14 22 10 18 Q 6 12 10 6 Q 14 0 22 0 Q 30 0 34 6 Q 38 12 34 18 Q 30 22 30 34 Z`}
-                  fill={isOn ? '#22c55e' : '#1e293b'}
-                  stroke={isOn ? '#4ade80' : '#475569'}
+                  fill={isOn ? '#22c55e' : '#ef4444'}
+                  stroke={isOn ? '#4ade80' : '#f87171'}
                   strokeWidth={1.5}
                   style={{ transition: 'fill 0.3s, stroke 0.3s' }}
                 />
-                {isOn && (
-                  <path
-                    d={`M 14 34 Q 14 22 10 18 Q 6 12 10 6 Q 14 0 22 0 Q 30 0 34 6 Q 38 12 34 18 Q 30 22 30 34 Z`}
-                    fill="none"
-                    stroke="#22c55e"
-                    strokeWidth={2}
-                    filter="url(#bulbGlow)"
-                  />
-                )}
+                <path
+                  d={`M 14 34 Q 14 22 10 18 Q 6 12 10 6 Q 14 0 22 0 Q 30 0 34 6 Q 38 12 34 18 Q 30 22 30 34 Z`}
+                  fill="none"
+                  stroke={isOn ? '#22c55e' : '#ef4444'}
+                  strokeWidth={2}
+                  filter="url(#bulbGlow)"
+                />
                 {/* Base / screw */}
                 <rect x={14} y={34} width={16} height={4} rx={1} fill="#94a3b8" />
                 <rect x={15} y={38} width={14} height={3} rx={1} fill="#64748b" />
@@ -340,9 +337,9 @@ export default function CircuitCanvas() {
                 {/* Filament lines when off */}
                 {!isOn && (
                   <>
-                    <line x1={18} y1={28} x2={18} y2={16} stroke="#475569" strokeWidth={1} />
-                    <line x1={26} y1={28} x2={26} y2={16} stroke="#475569" strokeWidth={1} />
-                    <path d="M 18 16 Q 22 10 26 16" fill="none" stroke="#475569" strokeWidth={1} />
+                    <line x1={18} y1={28} x2={18} y2={16} stroke="#fca5a5" strokeWidth={1} />
+                    <line x1={26} y1={28} x2={26} y2={16} stroke="#fca5a5" strokeWidth={1} />
+                    <path d="M 18 16 Q 22 10 26 16" fill="none" stroke="#fca5a5" strokeWidth={1} />
                   </>
                 )}
                 {/* Glow filter */}
@@ -357,7 +354,7 @@ export default function CircuitCanvas() {
                 </defs>
               </svg>
             </div>
-            <span className="text-[10px] font-mono font-bold" style={{ color: isOn ? '#22c55e' : '#64748b' }}>
+            <span className="text-[10px] font-mono font-bold" style={{ color: isOn ? '#22c55e' : '#ef4444' }}>
               OUTPUT
             </span>
           </div>

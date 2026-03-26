@@ -20,7 +20,7 @@ export default function ToggleSwitch({ label }: ToggleSwitchProps) {
         onClick={() => toggleSwitch(label)}
         disabled={isRunning}
         className={`relative w-12 h-6 rounded-full transition-all duration-200 ${
-          value ? 'bg-success' : 'bg-surface-light'
+          value ? 'bg-success' : 'bg-danger'
         } ${isRunning ? 'opacity-50' : ''}`}
       >
         <div

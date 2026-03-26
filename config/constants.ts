@@ -11,19 +11,19 @@ export const COLORS = {
   gateBody: '#1e293b',
   gateStroke: '#475569',
   gateText: '#e2e8f0',
-  portFill: '#64748b',
+  portFill: '#ef4444',
   portStroke: '#94a3b8',
   portHoverValid: '#22c55e',
   portHoverInvalid: '#ef4444',
   wireOn: '#22c55e',
-  wireOff: '#64748b',
+  wireOff: '#ef4444',
   wireDrag: '#3b82f6',
   wireDragInvalid: '#ef4444',
   selectedStroke: '#3b82f6',
   ledOn: '#22c55e',
-  ledOff: '#374151',
+  ledOff: '#ef4444',
   switchOn: '#22c55e',
-  switchOff: '#64748b',
+  switchOff: '#ef4444',
 };
 
 export const SIMULATION_DELAY_MS = 400;

@@ -11,9 +11,9 @@
   --danger: #ef4444;
   --warning: #f59e0b;
   --led-on: #22c55e;
-  --led-off: #374151;
+  --led-off: #ef4444;
   --wire-on: #22c55e;
-  --wire-off: #64748b;
+  --wire-off: #ef4444;
 }
 
 @theme inline {

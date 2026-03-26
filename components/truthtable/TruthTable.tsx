@@ -63,7 +63,7 @@ export default function TruthTable() {
                     >
                       <span
                         className={
-                          bit ? 'text-success' : 'text-foreground/40'
+                          bit ? 'text-success' : 'text-danger'
                         }
                       >
                         {bit ? '1' : '0'}
