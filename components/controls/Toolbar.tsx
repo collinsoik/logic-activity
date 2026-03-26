@@ -110,7 +110,6 @@ export default function Toolbar() {
             className="flex items-center gap-2 px-3 py-1 rounded bg-surface-light hover:bg-white/10 text-sm font-mono"
           >
             <span className="text-accent font-bold">Level {currentLevelId}</span>
-            <span className="text-foreground/70">{level.expression}</span>
             {isComplete && <span className="text-success">&#10003;</span>}
           </button>
 
