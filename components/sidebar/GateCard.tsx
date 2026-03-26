@@ -7,68 +7,77 @@ interface GateCardProps {
   type: GateType;
 }
 
+// Gate symbols oriented upward: inputs at bottom, output at top
 function GateSymbol({ type }: { type: GateType }) {
-  const w = 60;
-  const h = 40;
+  const w = 50;
+  const h = 50;
 
   return (
     <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
       {type === 'AND' && (
         <>
+          {/* Flat bottom, curved top */}
           <path
-            d={`M 5 5 L 30 5 Q 55 5 55 20 Q 55 35 30 35 L 5 35 Z`}
+            d={`M 5 45 L 5 25 A 20 20 0 0 1 45 25 L 45 45 Z`}
             fill="none"
             stroke="#94a3b8"
             strokeWidth={2}
           />
-          <line x1={0} y1={14} x2={5} y2={14} stroke="#64748b" strokeWidth={2} />
-          <line x1={0} y1={26} x2={5} y2={26} stroke="#64748b" strokeWidth={2} />
-          <line x1={55} y1={20} x2={60} y2={20} stroke="#64748b" strokeWidth={2} />
+          {/* Input lines at bottom */}
+          <line x1={17} y1={45} x2={17} y2={50} stroke="#64748b" strokeWidth={2} />
+          <line x1={33} y1={45} x2={33} y2={50} stroke="#64748b" strokeWidth={2} />
+          {/* Output line at top */}
+          <line x1={25} y1={5} x2={25} y2={0} stroke="#64748b" strokeWidth={2} />
         </>
       )}
       {type === 'OR' && (
         <>
+          {/* Curved body pointing up */}
           <path
-            d={`M 5 5 Q 20 20 5 35 Q 30 35 55 20 Q 30 5 5 5 Z`}
+            d={`M 5 45 Q 5 25 25 5 Q 45 25 45 45 Q 25 38 5 45 Z`}
             fill="none"
             stroke="#94a3b8"
             strokeWidth={2}
           />
-          <line x1={0} y1={14} x2={10} y2={14} stroke="#64748b" strokeWidth={2} />
-          <line x1={0} y1={26} x2={10} y2={26} stroke="#64748b" strokeWidth={2} />
-          <line x1={55} y1={20} x2={60} y2={20} stroke="#64748b" strokeWidth={2} />
+          <line x1={17} y1={43} x2={17} y2={50} stroke="#64748b" strokeWidth={2} />
+          <line x1={33} y1={43} x2={33} y2={50} stroke="#64748b" strokeWidth={2} />
+          <line x1={25} y1={5} x2={25} y2={0} stroke="#64748b" strokeWidth={2} />
         </>
       )}
       {type === 'NOT' && (
         <>
+          {/* Triangle pointing up */}
           <path
-            d={`M 5 5 L 45 20 L 5 35 Z`}
+            d={`M 5 45 L 25 15 L 45 45 Z`}
             fill="none"
             stroke="#94a3b8"
             strokeWidth={2}
           />
-          <circle cx={49} cy={20} r={4} fill="none" stroke="#94a3b8" strokeWidth={2} />
-          <line x1={0} y1={20} x2={5} y2={20} stroke="#64748b" strokeWidth={2} />
-          <line x1={53} y1={20} x2={60} y2={20} stroke="#64748b" strokeWidth={2} />
+          {/* Bubble at top */}
+          <circle cx={25} cy={10} r={4} fill="none" stroke="#94a3b8" strokeWidth={2} />
+          <line x1={25} y1={45} x2={25} y2={50} stroke="#64748b" strokeWidth={2} />
+          <line x1={25} y1={6} x2={25} y2={0} stroke="#64748b" strokeWidth={2} />
         </>
       )}
       {type === 'XOR' && (
         <>
+          {/* Main body */}
           <path
-            d={`M 10 5 Q 25 20 10 35 Q 35 35 55 20 Q 35 5 10 5 Z`}
+            d={`M 5 45 Q 5 25 25 5 Q 45 25 45 45 Q 25 38 5 45 Z`}
             fill="none"
             stroke="#94a3b8"
             strokeWidth={2}
           />
+          {/* Extra curve at bottom */}
           <path
-            d={`M 5 5 Q 20 20 5 35`}
+            d={`M 5 49 Q 25 42 45 49`}
             fill="none"
             stroke="#94a3b8"
             strokeWidth={2}
           />
-          <line x1={0} y1={14} x2={14} y2={14} stroke="#64748b" strokeWidth={2} />
-          <line x1={0} y1={26} x2={14} y2={26} stroke="#64748b" strokeWidth={2} />
-          <line x1={55} y1={20} x2={60} y2={20} stroke="#64748b" strokeWidth={2} />
+          <line x1={17} y1={47} x2={17} y2={50} stroke="#64748b" strokeWidth={2} />
+          <line x1={33} y1={47} x2={33} y2={50} stroke="#64748b" strokeWidth={2} />
+          <line x1={25} y1={5} x2={25} y2={0} stroke="#64748b" strokeWidth={2} />
         </>
       )}
     </svg>

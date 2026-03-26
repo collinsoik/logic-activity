@@ -40,6 +40,8 @@ export const GATE_DEFINITIONS: Record<GateType, GateDefinition> = {
   },
 };
 
+// Ports oriented for bottom-to-top flow:
+// Inputs on the bottom edge, output on the top edge
 export function getPortPositions(
   gateId: string,
   gateType: GateType,
@@ -49,28 +51,30 @@ export function getPortPositions(
   const def = GATE_DEFINITIONS[gateType];
   const ports: { id: string; nodeId: string; type: 'input' | 'output'; index: number; x: number; y: number }[] = [];
 
+  // Input ports along the bottom edge
   for (let i = 0; i < def.inputCount; i++) {
-    const yOffset =
+    const xOffset =
       def.inputCount === 1
-        ? GATE_HEIGHT * 0.5
-        : GATE_HEIGHT * (0.33 + i * 0.34);
+        ? GATE_WIDTH * 0.5
+        : GATE_WIDTH * (0.3 + i * 0.4);
     ports.push({
       id: `${gateId}-in-${i}`,
       nodeId: gateId,
       type: 'input',
       index: i,
-      x: gateX,
-      y: gateY + yOffset,
+      x: gateX + xOffset,
+      y: gateY + GATE_HEIGHT,
     });
   }
 
+  // Output port at the top center
   ports.push({
     id: `${gateId}-out-0`,
     nodeId: gateId,
     type: 'output',
     index: 0,
-    x: gateX + GATE_WIDTH,
-    y: gateY + GATE_HEIGHT * 0.5,
+    x: gateX + GATE_WIDTH * 0.5,
+    y: gateY,
   });
 
   return ports;

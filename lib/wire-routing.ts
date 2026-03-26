@@ -4,13 +4,14 @@ export function computeWirePath(
   toX: number,
   toY: number
 ): string {
-  const dx = Math.abs(toX - fromX);
-  const offset = Math.max(50, dx * 0.5);
+  // Vertical flow: wires go from bottom (outputs/switches) to top (inputs/output bulb)
+  const dy = Math.abs(toY - fromY);
+  const offset = Math.max(50, dy * 0.5);
 
-  const cp1x = fromX + offset;
-  const cp1y = fromY;
-  const cp2x = toX - offset;
-  const cp2y = toY;
+  const cp1x = fromX;
+  const cp1y = fromY - offset;
+  const cp2x = toX;
+  const cp2y = toY + offset;
 
   return `M ${fromX} ${fromY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${toX} ${toY}`;
 }

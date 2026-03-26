@@ -212,7 +212,7 @@ export default function CircuitCanvas() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full overflow-hidden bg-background"
+      className="relative w-full h-full overflow-hidden bg-background select-none"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onMouseMove={handleMouseMove}
