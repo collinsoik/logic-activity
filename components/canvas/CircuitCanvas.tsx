@@ -52,9 +52,9 @@ export default function CircuitCanvas() {
     return positions;
   }, [level.inputs, width, height]);
 
-  // Output position at the top center of the canvas
+  // Output node position (where wires attach, beneath the bulb)
   const outputPosition = useMemo(
-    () => ({ x: width / 2, y: 40 }),
+    () => ({ x: width / 2, y: 110 }),
     [width, height]
   );
 
@@ -293,16 +293,8 @@ export default function CircuitCanvas() {
             className="absolute flex flex-col items-center gap-1"
             style={{
               left: outputPosition.x - 22,
-              top: outputPosition.y - 28,
+              top: outputPosition.y - 95,
               pointerEvents: 'auto',
-            }}
-            onMouseDown={(e) => {
-              e.stopPropagation();
-              handlePortMouseDown('output-in-0', outputPosition.x, outputPosition.y);
-            }}
-            onMouseUp={(e) => {
-              e.stopPropagation();
-              handlePortMouseUp('output-in-0');
             }}
           >
             {/* Bulb */}
@@ -360,6 +352,23 @@ export default function CircuitCanvas() {
             <span className="text-[10px] font-mono font-bold" style={{ color: isOn ? '#22c55e' : '#64748b' }}>
               OUTPUT
             </span>
+            {/* Connection node beneath the bulb */}
+            <div
+              className="w-[16px] h-[16px] rounded-full border-2 cursor-crosshair transition-all hover:scale-125"
+              style={{
+                backgroundColor: isOn ? '#22c55e' : '#64748b',
+                borderColor: isOn ? '#4ade80' : '#94a3b8',
+                boxShadow: isOn ? '0 0 6px #22c55e' : 'none',
+              }}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                handlePortMouseDown('output-in-0', outputPosition.x, outputPosition.y);
+              }}
+              onMouseUp={(e) => {
+                e.stopPropagation();
+                handlePortMouseUp('output-in-0');
+              }}
+            />
           </div>
         );
       })()}
