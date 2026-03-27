@@ -1,6 +1,6 @@
 import { StateCreator } from 'zustand';
-import { VersusChallenge, InputLabel } from '@/lib/types';
-import { AppStore } from '@/store';
+import { VersusChallenge } from '@/lib/types';
+import type { AppStore } from '@/store';
 
 export type VersusPhase = 'idle' | 'build' | 'guess';
 
