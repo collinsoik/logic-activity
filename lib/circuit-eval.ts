@@ -1,4 +1,4 @@
-import { Gate, Wire } from './types';
+import { Gate, Wire, InputLabel } from './types';
 import { GATE_DEFINITIONS, getPortPositions } from './gate-defs';
 
 interface EvalContext {
@@ -211,4 +211,58 @@ export function hasCycle(
   }
 
   return false;
+}
+
+export function isCircuitComplete(
+  gates: Gate[],
+  wires: Wire[],
+  inputs: InputLabel[]
+): { complete: boolean; reason?: string } {
+  if (gates.length === 0) {
+    return { complete: false, reason: 'No gates placed' };
+  }
+
+  const hasOutput = wires.some((w) => w.toPortId === 'output-in-0');
+  if (!hasOutput) {
+    return { complete: false, reason: 'Output bulb is not connected' };
+  }
+
+  const count = Math.pow(2, inputs.length);
+  for (let i = 0; i < count; i++) {
+    const bits = inputs.map((_, idx) => !!(i & (1 << (inputs.length - 1 - idx))));
+    const switchValues = {
+      A: bits[0] ?? false,
+      B: bits[1] ?? false,
+      C: bits[2] ?? false,
+    };
+    const { output } = evaluateCircuit({ gates, wires, switchValues });
+    if (output === null) {
+      return { complete: false, reason: 'Some gates have unconnected inputs' };
+    }
+  }
+
+  return { complete: true };
+}
+
+export function generateTruthTableFromCircuit(
+  gates: Gate[],
+  wires: Wire[],
+  inputs: InputLabel[]
+): boolean[] | null {
+  const count = Math.pow(2, inputs.length);
+  const outputs: boolean[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const bits = inputs.map((_, idx) => !!(i & (1 << (inputs.length - 1 - idx))));
+    const switchValues = {
+      A: bits[0] ?? false,
+      B: bits[1] ?? false,
+      C: bits[2] ?? false,
+    };
+    const { output } = evaluateCircuit({ gates, wires, switchValues });
+    if (output === null) return null;
+    outputs.push(output);
+  }
+
+  return outputs;
 }

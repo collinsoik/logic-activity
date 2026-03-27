@@ -7,9 +7,8 @@ import { useStore } from '@/store';
 import GridLayer from './GridLayer';
 import GatesLayer from './GatesLayer';
 import WireSvgOverlay from '../wires/WireSvgOverlay';
-import { evaluateCircuit } from '@/lib/circuit-eval';
-import { LEVELS } from '@/lib/levels';
-import { hasCycle } from '@/lib/circuit-eval';
+import { evaluateCircuit, hasCycle } from '@/lib/circuit-eval';
+import { useActiveInputs } from '@/hooks/useActiveInputs';
 import { GATE_DEFINITIONS, getPortPositions } from '@/lib/gate-defs';
 import { KonvaEventObject } from 'konva/lib/Node';
 
@@ -20,7 +19,6 @@ export default function CircuitCanvas() {
   const gates = useStore((s) => s.gates);
   const wires = useStore((s) => s.wires);
   const switchValues = useStore((s) => s.switchValues);
-  const currentLevelId = useStore((s) => s.currentLevelId);
   const addGate = useStore((s) => s.addGate);
   const addWire = useStore((s) => s.addWire);
   const selectGate = useStore((s) => s.selectGate);
@@ -35,11 +33,10 @@ export default function CircuitCanvas() {
   const updateWireDrag = useStore((s) => s.updateWireDrag);
   const endWireDrag = useStore((s) => s.endWireDrag);
 
-  const level = LEVELS.find((l) => l.id === currentLevelId)!;
+  const inputs = useActiveInputs();
 
   // Switch positions at the bottom of the canvas
   const switchPositions = useMemo(() => {
-    const inputs = level.inputs;
     const spacing = width / (inputs.length + 1);
     const y = height - 30;
     const positions: Record<string, { x: number; y: number }> = {};
@@ -50,7 +47,7 @@ export default function CircuitCanvas() {
       };
     });
     return positions;
-  }, [level.inputs, width, height]);
+  }, [inputs, width, height]);
 
   // Output node position (where wires attach, beneath the bulb)
   const outputPosition = useMemo(
@@ -242,7 +239,7 @@ export default function CircuitCanvas() {
       />
 
       {/* Switch connection points rendered on canvas */}
-      {level.inputs.map((label) => {
+      {inputs.map((label) => {
         const pos = switchPositions[`switch-${label}-out-0`];
         if (!pos) return null;
         const isOn = switchValues[label];

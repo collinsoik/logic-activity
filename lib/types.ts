@@ -43,3 +43,8 @@ export interface SimulationRow {
   expected: boolean;
   actual: boolean | null;
 }
+
+export interface VersusChallenge {
+  inputs: InputLabel[];
+  expectedOutputs: boolean[];
+}

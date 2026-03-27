@@ -3,14 +3,14 @@
 import { useStore } from '@/store';
 import { LEVELS } from '@/lib/levels';
 import { useCallback, useRef, useState } from 'react';
-import { evaluateCircuit } from '@/lib/circuit-eval';
-import { SIMULATION_DELAY_MS } from '@/config/constants';
-import { SimulationRow, InputLabel } from '@/lib/types';
+import { runSimulation } from '@/lib/run-simulation';
+import VersusToolbar from '@/components/versus/VersusToolbar';
 
 export default function Toolbar() {
+  const appMode = useStore((s) => s.appMode);
+  const enterVersusMode = useStore((s) => s.enterVersusMode);
+
   const currentLevelId = useStore((s) => s.currentLevelId);
-  const nextLevel = useStore((s) => s.nextLevel);
-  const prevLevel = useStore((s) => s.prevLevel);
   const setCurrentLevel = useStore((s) => s.setCurrentLevel);
   const clearCircuit = useStore((s) => s.clearCircuit);
   const isRunning = useStore((s) => s.isRunning);
@@ -30,51 +30,21 @@ export default function Toolbar() {
   const handleRun = useCallback(async () => {
     const { gates, wires } = useStore.getState();
     const lvl = LEVELS.find((l) => l.id === useStore.getState().currentLevelId)!;
-    const inputs = lvl.inputs;
-    const count = Math.pow(2, inputs.length);
-    const rows: SimulationRow[] = [];
 
-    setIsRunning(true);
-    resetResults();
-
-    for (let i = 0; i < count; i++) {
-      const bits = inputs.map(
-        (_, idx) => !!(i & (1 << (inputs.length - 1 - idx)))
-      );
-      const switchVals = {
-        A: bits[0] ?? false,
-        B: bits[1] ?? false,
-        C: bits[2] ?? false,
-      };
-
-      setSwitchValues(switchVals);
-      setCurrentRunRow(i);
-
-      await new Promise((r) => setTimeout(r, SIMULATION_DELAY_MS));
-
-      const { output } = evaluateCircuit({ gates, wires, switchValues: switchVals });
-      const expected = lvl.evaluate(switchVals.A, switchVals.B, switchVals.C);
-
-      rows.push({
-        inputs: bits,
-        expected,
-        actual: output,
-      });
-
-      setResults([...rows]);
-    }
-
-    // Check if all correct
-    const allCorrect = rows.every(
-      (r) => r.actual !== null && r.actual === r.expected
+    const allCorrect = await runSimulation(
+      gates,
+      wires,
+      lvl.inputs,
+      lvl.expectedOutputs,
+      { setSwitchValues, setCurrentRunRow, setResults, setIsRunning, resetResults }
     );
+
     if (allCorrect) {
       markLevelComplete(lvl.id);
     }
-
-    setIsRunning(false);
-    setCurrentRunRow(null);
   }, [setIsRunning, resetResults, setSwitchValues, setCurrentRunRow, setResults, markLevelComplete]);
+
+  if (appMode === 'versus') return <VersusToolbar />;
 
   const handleClear = useCallback(() => {
     clearCircuit();
@@ -152,6 +122,13 @@ export default function Toolbar() {
       </div>
 
       <div className="flex items-center gap-2">
+        <button
+          onClick={enterVersusMode}
+          disabled={isRunning}
+          className="px-3 py-1 rounded bg-purple-600/80 hover:bg-purple-600 disabled:opacity-30 text-white text-sm font-bold"
+        >
+          VS
+        </button>
         <button
           onClick={handleClear}
           disabled={isRunning}

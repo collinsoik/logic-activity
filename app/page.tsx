@@ -5,6 +5,8 @@ import Toolbar from '@/components/controls/Toolbar';
 import GatePalette from '@/components/sidebar/GatePalette';
 import SwitchPanel from '@/components/switches/SwitchPanel';
 import TruthTable from '@/components/truthtable/TruthTable';
+import ModeSelector from '@/components/versus/ModeSelector';
+import VersusOverlay from '@/components/versus/VersusOverlay';
 import { useStore } from '@/store';
 import { useEffect } from 'react';
 
@@ -15,10 +17,16 @@ const CircuitCanvas = dynamic(
 
 export default function Home() {
   const loadProgress = useStore((s) => s.loadProgress);
+  const appMode = useStore((s) => s.appMode);
+  const versusPhase = useStore((s) => s.versusPhase);
+  const versusChallenge = useStore((s) => s.versusChallenge);
 
   useEffect(() => {
     loadProgress();
   }, [loadProgress]);
+
+  const showModeSelector = appMode === 'versus' && versusPhase === 'idle';
+  const showHandoff = appMode === 'versus' && versusChallenge !== null && versusPhase === 'build';
 
   return (
     <div
@@ -41,6 +49,8 @@ export default function Home() {
       </div>
       <div style={{ gridArea: 'canvas' }} className="relative">
         <CircuitCanvas />
+        {showModeSelector && <ModeSelector />}
+        {showHandoff && <VersusOverlay />}
       </div>
       <div style={{ gridArea: 'palette' }}>
         <GatePalette />

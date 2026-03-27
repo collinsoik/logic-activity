@@ -2,16 +2,53 @@
 
 import { useStore } from '@/store';
 import { LEVELS } from '@/lib/levels';
+import { useActiveInputs } from '@/hooks/useActiveInputs';
+import { evaluateCircuit } from '@/lib/circuit-eval';
 import LedCell from './LedCell';
+import { useMemo } from 'react';
 
 export default function TruthTable() {
+  const appMode = useStore((s) => s.appMode);
+  const versusPhase = useStore((s) => s.versusPhase);
+  const versusChallenge = useStore((s) => s.versusChallenge);
   const currentLevelId = useStore((s) => s.currentLevelId);
   const results = useStore((s) => s.results);
   const currentRunRow = useStore((s) => s.currentRunRow);
+  const gates = useStore((s) => s.gates);
+  const wires = useStore((s) => s.wires);
 
-  const level = LEVELS.find((l) => l.id === currentLevelId)!;
-  const inputs = level.inputs;
+  const inputs = useActiveInputs();
   const rowCount = Math.pow(2, inputs.length);
+
+  const isBuildPhase = appMode === 'versus' && versusPhase === 'build';
+  const isGuessPhase = appMode === 'versus' && versusPhase === 'guess';
+
+  // In level mode, get expected outputs from the level definition
+  const level = appMode === 'levels' ? LEVELS.find((l) => l.id === currentLevelId)! : null;
+
+  // Expected outputs source depends on mode
+  const expectedOutputs = isGuessPhase && versusChallenge
+    ? versusChallenge.expectedOutputs
+    : level?.expectedOutputs ?? [];
+
+  // Live evaluation for build phase - evaluate circuit for all input combos
+  const liveOutputs = useMemo(() => {
+    if (!isBuildPhase) return null;
+    const outputs: (boolean | null)[] = [];
+    for (let i = 0; i < rowCount; i++) {
+      const bits = inputs.map(
+        (_, idx) => !!(i & (1 << (inputs.length - 1 - idx)))
+      );
+      const switchValues = {
+        A: bits[0] ?? false,
+        B: bits[1] ?? false,
+        C: bits[2] ?? false,
+      };
+      const { output } = evaluateCircuit({ gates, wires, switchValues });
+      outputs.push(output);
+    }
+    return outputs;
+  }, [isBuildPhase, rowCount, inputs, gates, wires]);
 
   return (
     <div className="flex flex-col h-full bg-surface border-r border-white/10 overflow-y-auto">
@@ -31,12 +68,20 @@ export default function TruthTable() {
                   {label}
                 </th>
               ))}
-              <th className="px-2 py-1.5 text-center font-mono text-foreground/50 border-l border-white/10">
-                Exp
-              </th>
-              <th className="px-2 py-1.5 text-center font-mono text-foreground/50">
-                Act
-              </th>
+              {isBuildPhase ? (
+                <th className="px-2 py-1.5 text-center font-mono text-foreground/50 border-l border-white/10">
+                  Out
+                </th>
+              ) : (
+                <>
+                  <th className="px-2 py-1.5 text-center font-mono text-foreground/50 border-l border-white/10">
+                    Exp
+                  </th>
+                  <th className="px-2 py-1.5 text-center font-mono text-foreground/50">
+                    Act
+                  </th>
+                </>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -45,8 +90,6 @@ export default function TruthTable() {
                 (_, bitIdx) =>
                   !!(rowIdx & (1 << (inputs.length - 1 - bitIdx)))
               );
-              const expected = level.expectedOutputs[rowIdx];
-              const result = results[rowIdx];
               const isCurrentRow = currentRunRow === rowIdx;
 
               return (
@@ -70,12 +113,20 @@ export default function TruthTable() {
                       </span>
                     </td>
                   ))}
-                  <td className="px-2 py-1.5 border-l border-white/10">
-                    <LedCell value={expected} />
-                  </td>
-                  <td className="px-2 py-1.5">
-                    <LedCell value={result?.actual ?? null} />
-                  </td>
+                  {isBuildPhase ? (
+                    <td className="px-2 py-1.5 border-l border-white/10">
+                      <LedCell value={liveOutputs ? liveOutputs[rowIdx] : null} />
+                    </td>
+                  ) : (
+                    <>
+                      <td className="px-2 py-1.5 border-l border-white/10">
+                        <LedCell value={expectedOutputs[rowIdx] ?? null} />
+                      </td>
+                      <td className="px-2 py-1.5">
+                        <LedCell value={results[rowIdx]?.actual ?? null} />
+                      </td>
+                    </>
+                  )}
                 </tr>
               );
             })}
@@ -83,7 +134,7 @@ export default function TruthTable() {
         </table>
       </div>
 
-      {results.length > 0 && (
+      {!isBuildPhase && results.length > 0 && (
         <div className="px-3 py-2 border-t border-white/10">
           {results.every((r) => r.actual !== null && r.actual === r.expected) ? (
             <div className="text-xs text-success font-bold text-center">
