@@ -44,8 +44,6 @@ export default function Toolbar() {
     }
   }, [setIsRunning, resetResults, setSwitchValues, setCurrentRunRow, setResults, markLevelComplete]);
 
-  if (appMode === 'versus') return <VersusToolbar />;
-
   const handleClear = useCallback(() => {
     clearCircuit();
     resetResults();
@@ -62,6 +60,8 @@ export default function Toolbar() {
     },
     [setCurrentLevel, clearCircuit, resetResults, setSwitchValues]
   );
+
+  if (appMode === 'versus') return <VersusToolbar />;
 
   return (
     <div className="flex items-center justify-between px-4 h-full bg-surface border-b border-white/10">
