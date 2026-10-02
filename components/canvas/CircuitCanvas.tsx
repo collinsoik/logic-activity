@@ -86,19 +86,10 @@ export default function CircuitCanvas() {
   // Port interactions for wiring
   const handlePortMouseDown = useCallback(
     (portId: string, x: number, y: number) => {
-      // Only allow dragging from output ports or switch outputs
-      if (portId.includes('-out-') || portId.startsWith('switch-')) {
-        startWireDrag(portId);
-      } else {
-        // Dragging from an input port — find existing wire connected to this input and start from its source
-        const existingWire = wires.find((w) => w.toPortId === portId);
-        if (existingWire) {
-          removeWire(existingWire.id);
-          startWireDrag(existingWire.fromPortId);
-        }
-      }
+      startWireDrag(portId);
+      updateWireDrag(x, y);
     },
-    [startWireDrag, wires, removeWire]
+    [startWireDrag, updateWireDrag]
   );
 
   const handlePortMouseUp = useCallback(
@@ -106,8 +97,9 @@ export default function CircuitCanvas() {
       if (!draggingWireFrom) return;
 
       // Validate connection
-      const fromId = draggingWireFrom;
-      const toId = portId;
+      const startedAtInput = draggingWireFrom.includes('-in-');
+      const fromId = startedAtInput ? portId : draggingWireFrom;
+      const toId = startedAtInput ? draggingWireFrom : portId;
 
       // Must connect output → input
       const isFromOutput =
@@ -133,9 +125,6 @@ export default function CircuitCanvas() {
 
       // Check if input already has a wire
       const existingWire = wires.find((w) => w.toPortId === toId);
-      if (existingWire) {
-        removeWire(existingWire.id);
-      }
 
       // Check for cycles
       if (hasCycle(gates, wires.filter((w) => w.id !== existingWire?.id), fromId, toId)) {
@@ -143,6 +132,13 @@ export default function CircuitCanvas() {
         return;
       }
 
+      if (existingWire?.fromPortId === fromId) {
+        endWireDrag();
+        return;
+      }
+      if (existingWire) {
+        removeWire(existingWire.id);
+      }
       addWire(fromId, toId);
       endWireDrag();
     },
@@ -165,6 +161,20 @@ export default function CircuitCanvas() {
       endWireDrag();
     }
   }, [draggingWireFrom, endWireDrag]);
+
+  useEffect(() => {
+    const handleRelease = (event: PointerEvent) => {
+      if (!(event.target instanceof Node) || !containerRef.current?.contains(event.target)) {
+        endWireDrag();
+      }
+    };
+    window.addEventListener('pointerup', handleRelease, true);
+    window.addEventListener('blur', endWireDrag);
+    return () => {
+      window.removeEventListener('pointerup', handleRelease, true);
+      window.removeEventListener('blur', endWireDrag);
+    };
+  }, [endWireDrag]);
 
   const handleStageClick = useCallback(
     (e: KonvaEventObject<MouseEvent>) => {

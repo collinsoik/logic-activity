@@ -13,13 +13,21 @@ export interface LevelSlice {
   prevLevel: () => void;
 }
 
-const STORAGE_KEY = 'logic-lab-progress';
+const STORAGE_KEY = 'logic-lab-progress-v2';
 
 function loadFromStorage(): Record<number, LevelProgress> {
   if (typeof window === 'undefined') return {};
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw);
+    const legacyRaw = localStorage.getItem('logic-lab-progress');
+    if (legacyRaw) {
+      const { 4: previousFour, 5: previousFive, ...progress } = JSON.parse(legacyRaw);
+      if (previousFive !== undefined) progress[4] = previousFive;
+      if (previousFour !== undefined) progress[5] = previousFour;
+      saveToStorage(progress);
+      return progress;
+    }
   } catch {
     // ignore
   }

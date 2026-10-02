@@ -16,7 +16,7 @@ export default function GatePalette() {
       ))}
       <div className="mt-auto pt-4 border-t border-white/10">
         <p className="text-[10px] text-foreground/30 leading-tight">
-          Drag gates onto the canvas. Click ports to connect wires.
+          Drag gates onto the canvas. Drag between ports in either direction to connect wires.
         </p>
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import Toolbar from '@/components/controls/Toolbar';
+import FullscreenButton from '@/components/controls/FullscreenButton';
 import GatePalette from '@/components/sidebar/GatePalette';
 import SwitchPanel from '@/components/switches/SwitchPanel';
 import TruthTable from '@/components/truthtable/TruthTable';
@@ -30,29 +31,32 @@ export default function Home() {
 
   return (
     <div
-      className="h-screen w-screen"
+      className="h-dvh w-full"
       style={{
         display: 'grid',
         gridTemplate: `
           "toolbar toolbar toolbar" 48px
-          "table canvas palette" 1fr
+          "table canvas palette" minmax(0, 1fr)
           "switches switches switches" 100px
-          / 220px 1fr 180px
+          / clamp(180px, 18vw, 220px) minmax(0, 1fr) clamp(130px, 15vw, 180px)
         `,
       }}
     >
-      <div style={{ gridArea: 'toolbar' }}>
-        <Toolbar />
+      <div style={{ gridArea: 'toolbar' }} className="relative flex min-w-0 bg-surface">
+        <div className="min-w-0 flex-1">
+          <Toolbar />
+        </div>
+        <FullscreenButton />
       </div>
-      <div style={{ gridArea: 'table' }}>
+      <div style={{ gridArea: 'table' }} className="min-h-0 min-w-0">
         <TruthTable />
       </div>
-      <div style={{ gridArea: 'canvas' }} className="relative">
+      <div style={{ gridArea: 'canvas' }} className="relative min-h-0 min-w-0">
         <CircuitCanvas />
         {showModeSelector && <ModeSelector />}
         {showHandoff && <VersusOverlay />}
       </div>
-      <div style={{ gridArea: 'palette' }}>
+      <div style={{ gridArea: 'palette' }} className="min-h-0 min-w-0">
         <GatePalette />
       </div>
       <div style={{ gridArea: 'switches' }}>

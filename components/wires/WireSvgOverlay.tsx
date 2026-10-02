@@ -55,6 +55,8 @@ export default function WireSvgOverlay({
   const removeWire = useStore((s) => s.removeWire);
   const draggingWireFrom = useStore((s) => s.draggingWireFrom);
   const draggingWireTo = useStore((s) => s.draggingWireTo);
+  const startWireDrag = useStore((s) => s.startWireDrag);
+  const updateWireDrag = useStore((s) => s.updateWireDrag);
 
   // Render completed wires
   const wireElements = useMemo(() => {
@@ -82,6 +84,21 @@ export default function WireSvgOverlay({
           }
           strokeWidth={signal ? 3 : 2}
           className="wire-path"
+          onMouseDown={(event) => {
+            const bounds = event.currentTarget.ownerSVGElement?.getBoundingClientRect();
+            if (!bounds) return;
+            const pointerX = event.clientX - bounds.left;
+            const pointerY = event.clientY - bounds.top;
+            const endpoint = [
+              { id: wire.fromPortId, ...from },
+              { id: wire.toPortId, ...to },
+            ].find((port) => Math.hypot(port.x - pointerX, port.y - pointerY) <= 10);
+            if (endpoint) {
+              event.stopPropagation();
+              startWireDrag(endpoint.id);
+              updateWireDrag(endpoint.x, endpoint.y);
+            }
+          }}
           onClick={(e) => {
             e.stopPropagation();
             selectWire(wire.id);
@@ -90,7 +107,7 @@ export default function WireSvgOverlay({
         />
       );
     });
-  }, [wires, gates, switchPositions, outputPosition, portValues, selectedWireId, selectWire]);
+  }, [wires, gates, switchPositions, outputPosition, portValues, selectedWireId, selectWire, startWireDrag, updateWireDrag]);
 
   // Render drag wire
   let dragWireElement = null;
@@ -129,7 +146,7 @@ export default function WireSvgOverlay({
       className="absolute top-0 left-0"
       style={{ pointerEvents: 'none' }}
     >
-      <g style={{ pointerEvents: 'auto' }}>{wireElements}</g>
+      <g style={{ pointerEvents: draggingWireFrom ? 'none' : 'auto' }}>{wireElements}</g>
       {dragWireElement}
     </svg>
   );
